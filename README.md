@@ -1,7 +1,17 @@
 # File Shrink
 
+🚧 **PROJECT STATUS: UNDER ACTIVE DEVELOPMENT** 🚧
+
 ## Project Overview
 A comprehensive C++ file compression tool using Huffman coding, supporting multiple file formats with AES encryption and batch processing.
+
+## Current Development Status
+- [x] Project architecture defined
+- [ ] Core compression algorithm
+- [ ] Encryption module
+- [ ] Batch processing implementation
+- [ ] Multi-format support
+- [ ] Testing framework
 
 ## Features
 - Lossless file compression
@@ -11,8 +21,8 @@ A comprehensive C++ file compression tool using Huffman coding, supporting multi
 - Metadata preservation
 
 ## Tech Stack
-- C++
-- STL
+- C++17
+- Standard Template Library (STL)
 - OpenSSL
 - Multithreading
 
