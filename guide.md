@@ -9,7 +9,7 @@
 - Efficient node selection
 - Minimal memory usage
 - Fast encoding/decoding
-- Optimal code generation
+- Optimal code generationz
 
 ## Recommended Approach:
 - Use priority queue for frequency sorting
