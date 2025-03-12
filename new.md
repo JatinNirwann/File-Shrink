@@ -1,79 +1,132 @@
-# File Compression Tool
+# Huffman Compression System
 
-## Project Overview
-I'm developing a versatile file compression tool in C that supports multiple file formats including text documents (PDF, Word, Excel) and potentially images. The project uses Huffman coding as the primary compression algorithm for text-based formats, with room for expansion to other compression techniques for image data.
+A high-performance file compression system implementing Huffman coding with AES-256 encryption and multi-threaded batch processing capabilities.
 
-## Project Structure
-The project is organized into several modular components:
+> **Note: This project is currently in development. The features and implementation described below represent the planned structure for the project. Work is in progress.**
 
-### Core Components
-- **compression_core.c/h**: Main compression/decompression functions
-- **frequency_analysis.c/h**: Symbol frequency analyzer for input files
-- **huffman.c/h**: Huffman tree generation and coding implementation
-- **file_format.c/h**: Format detection and handling logic
-- **bitstream.c/h**: Bit-level I/O operations for efficient encoding/decoding
-- **utils.c/h**: Common utility functions used across modules
+## Features
 
-### Format-Specific Handlers
-- **text_handler.c/h**: Processes text-based formats (PDF, DOC, XLSX)
-- **image_handler.c/h**: Handles image compression (to be implemented)
-- **binary_handler.c/h**: Manages generic binary file compression
+- **Universal Format Support**: Compresses text, PDF, images, Word documents, and more
+- **High-Efficiency Compression**: Uses Huffman coding for optimal lossless compression
+- **Military-Grade Security**: Implements AES-256 encryption on compressed data
+- **Batch Processing**: Multi-threaded architecture for processing multiple files simultaneously
+- **Metadata Preservation**: Maintains file integrity for complex document types
 
-## Development Phases
+## Implementation Overview (Planned)
 
-### Phase 1: Core Compression Engine
-- Implement frequency analysis for input data
-- Build Huffman tree generator
-- Create bit-level I/O operations
-- Develop basic compression/decompression functions
+### 1. File Input Processing
+- Binary processing of any file type
+- Streaming architecture for handling large files efficiently
+- Support for various file formats through binary data processing
 
-### Phase 2: Text Format Support
-- Add support for plain text files
-- Extend functionality to handle structured text formats (DOC, PDF, XLSX)
-- Implement format detection mechanisms
+### 2. Character Frequency Analysis
+- Hash map-based byte frequency counter
+- Efficient single-pass algorithm for frequency determination
+- Foundation for building optimal Huffman trees
 
-### Phase 3: Image Support
-- Research and implement appropriate image compression techniques
-- Possibly combine Huffman with run-length encoding or other methods
-- Optimize for different image types
+### 3. Huffman Tree Construction
+- Custom node structure implementation
+- Min-heap priority queue for tree building
+- Optimal prefix-free code generation
 
-## Technical Details
+### 4. Code Generation
+- Tree traversal algorithms for code assignment
+- Hash map for quick character-to-code lookup
+- Prefix-free code verification
 
-### Key Data Structures
-The project relies on several fundamental data structures:
+### 5. Compression Algorithm
+- Efficient bit packing (8 bits per byte)
+- Header generation for decoding information
+- Minimal memory footprint during processing
 
-```c
-// Huffman tree node
-typedef struct HuffmanNode {
-    unsigned char symbol;
-    unsigned int frequency;
-    struct HuffmanNode *left, *right;
-} HuffmanNode;
+### 6. Decompression Algorithm
+- Header parsing for Huffman tree reconstruction
+- Bit-by-bit processing of compressed data
+- Original file reconstruction
 
-// Priority queue (min-heap) implementation
-typedef struct PriorityQueue {
-    HuffmanNode **nodes;
-    int size;
-    int capacity;
-} PriorityQueue;
+### 7. Metadata Preservation
+- Selective compression for file headers and signatures
+- Special handling for complex file formats
+- Perfect reconstruction of original files
+
+### 8. AES Encryption
+- Industry-standard AES-256 implementation
+- Password-based encryption/decryption
+- Secure password verification
+
+### 9. Batch Processing
+- Thread pool architecture for parallel processing
+- Work queue implementation for optimal CPU utilization
+- Progress tracking for multiple file operations
+- Organized output directory structure
+
+### 10. Performance Analysis Tools
+- Compression ratio measurements
+- Execution time tracking
+- Comparative analysis with other algorithms
+- Memory usage monitoring
+
+## Technical Requirements
+
+- C++17 compatible compiler
+- OpenSSL library for encryption functionality
+- Standard Template Library (STL)
+- Minimum 4GB RAM recommended for large files
+
+## Development Status
+
+This project is currently under active development. The following components are being worked on:
+
+- [ ] Core Huffman coding implementation
+- [ ] File I/O and binary processing
+- [ ] Encryption module integration
+- [ ] Multi-threading architecture
+- [ ] Command line interface
+
+## Projected Getting Started (Upon Completion)
+
+1. Clone the repository
+2. Build using provided Makefile or CMake configuration
+3. Run the executable with input files as parameters
+
+```bash
+# Basic compression
+./huffman_compress input_file.txt
+
+# Compression with encryption
+./huffman_compress -e input_file.txt
+
+# Batch processing
+./huffman_compress -b directory/*
+
+# Full options
+./huffman_compress -e -b -t 8 directory/* -o output_dir/
 ```
 
-### Algorithms
-- **Huffman Coding**: Used for text compression
-- **Format Detection**: Analyzes file headers and content patterns
-- **Additional compression techniques**: To be explored for image data
+## Planned Command Line Options
 
-## Project Goals
-- Create an efficient, modular compression tool
-- Support multiple file formats
-- Achieve competitive compression ratios
-- Learn and implement fundamental compression algorithms
+- `-e, --encrypt`: Enable AES-256 encryption
+- `-b, --batch`: Enable batch processing mode
+- `-t, --threads [num]`: Specify number of threads for batch processing
+- `-o, --output [dir]`: Specify output directory
+- `-v, --verbose`: Enable detailed logging
+- `-h, --help`: Display help information
 
-## Future Enhancements
-- GUI interface
-- Batch processing capabilities
-- Custom compression profiles
-- Support for additional file formats
+## Target Performance Expectations
 
-## Contribution
-This is a personal learning project, but suggestions and feedback are welcome!
+| File Type | Targeted Compression Ratio | Expected Processing Speed |
+|-----------|----------------------------|---------------------------|
+| Text      | 40-60%                     | ~100MB/s                  |
+| PDF       | 20-40%                     | ~80MB/s                   |
+| Images    | 10-30%                     | ~60MB/s                   |
+| Word Docs | 30-50%                     | ~90MB/s                   |
+
+*Projected performance metrics based on design specifications. Actual results may vary.*
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request or open an issue to discuss implementation details.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
