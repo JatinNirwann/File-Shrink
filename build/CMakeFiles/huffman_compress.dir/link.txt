@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/huffman_compress.dir/HuffmanCompress.cpp.o -o huffman_compress  /usr/lib/aarch64-linux-gnu/libssl.so /usr/lib/aarch64-linux-gnu/libcrypto.so 

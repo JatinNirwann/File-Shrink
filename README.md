@@ -1,51 +1,26 @@
-# File Shrink
+# Huffman Compression System
 
-🚧 **PROJECT STATUS: UNDER ACTIVE DEVELOPMENT** 🚧
-
-## Project Overview
-A comprehensive C++ file compression tool using Huffman coding, supporting multiple file formats with AES encryption and batch processing.
-
-## Current Development Status
-- [x] Project architecture defined
-- [ ] Core compression algorithm
-- [ ] Encryption module
-- [ ] Batch processing implementation
-- [ ] Multi-format support
-- [ ] Testing framework
+## Overview
+The Huffman Compression System is a high-performance file compression tool using Huffman coding. It supports optional AES-256 encryption for secure file storage and transmission. The system is designed for batch processing and efficient multi-threaded execution.
 
 ## Features
-- Lossless file compression
-- Multi-format support (PDF, Images, Word documents)
-- AES-256 encryption
-- Batch file processing
-- Metadata preservation
+- Lossless data compression using Huffman coding.
+- Optional AES-256 encryption for secure compression.
+- Batch processing for handling multiple files simultaneously.
+- Multi-threaded execution for improved performance.
+- File handling utilities for reading, writing, and processing files.
+- Performance analysis tools for benchmarking compression efficiency.
 
-## Tech Stack
-- C++17
-- Standard Template Library (STL)
-- OpenSSL
-- Multithreading
+## Installation
+### Prerequisites
+Ensure you have the following installed:
+- CMake 3.12 or higher
+- C++17 compatible compiler (GCC, Clang, MSVC)
+- OpenSSL for encryption
+- Doxygen (optional, for documentation generation)
 
-## Prerequisites
-- C++17 Compiler
-- OpenSSL Library
-- CMake 3.10+
-
-
-### Options
-- `-c`: Compress files
-- `-d`: Decompress files
-- `-e`: Enable encryption
-- `-p`: Set password
-
-## Project Structure
-```
-project_root/
-├── src/
-│   ├── compression/
-│   ├── encryption/
-│   └── batch_processing/
-├── include/
-├── tests/
-└── README.md
-```
+### Build Instructions
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/jatinnirwan/huffman-compression.git
+   cd huffman-compression

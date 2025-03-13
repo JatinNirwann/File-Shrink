@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: 5pnwl-ehrwk
+created: 2025-03-12T10:51:45+05:30
