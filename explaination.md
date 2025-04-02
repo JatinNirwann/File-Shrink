@@ -1,195 +1,396 @@
-# File-Shrink Project Explanation
+# File-Shrink: Comprehensive Technical Explanation
 
-I'll explain how the entire `File-Shrink` project works, covering each header file and the main implementation.
+This document provides a detailed explanation of the File-Shrink compression system, covering the core compression algorithm, file operations, encryption, batch processing, and performance analysis components.
 
-## Overview of Files and Their Functions
+## Table of Contents
+- [Introduction](#introduction)
+- [Core Algorithm: Huffman Coding](#core-algorithm-huffman-coding)
+- [Compression and Decompression Process](#compression-and-decompression-process)
+- [File Management](#file-management)
+- [Security: AES-256 Encryption](#security-aes-256-encryption)
+- [Parallel Processing](#parallel-processing)
+- [Performance Analysis](#performance-analysis)
+- [Main Application Structure](#main-application-structure)
+- [Technical Design Decisions](#technical-design-decisions)
+- [Algorithms Used](#algorithms-used)
 
-### 1. HuffmanCore.h
+## Introduction
 
-This file contains the core data structures for Huffman compression:
+File-Shrink is a comprehensive file compression utility that implements Huffman coding with advanced features including encryption, batch processing, and performance analytics. The system consists of modular components working together to provide efficient lossless compression.
 
-- **FrequencyMap**: Maps bytes to their frequencies in the input data
-- **HuffmanNode**: Tree node structure used to build the Huffman tree
-  - Contains byte value, frequency, and pointers to child nodes
-  - Supports leaf node detection with `isLeaf()`
-- **HuffmanTree**: Shared pointer to a HuffmanNode (root of tree)
-- **PriorityQueue**: Minimum heap for Huffman nodes, ordered by frequency
-- **CodeMap**: Maps bytes to their Huffman codes (strings of '0's and '1's)
-- **BitReader/BitWriter**: Utilities for reading/writing individual bits
+## Core Algorithm: Huffman Coding
 
-These structures form the foundation for Huffman coding, which assigns shorter codes to more frequent symbols.
+### What is Huffman Coding?
 
-### 2. HuffmanCompressor.h
+Huffman coding is an entropy-based compression technique that assigns variable-length codes to input characters, with shorter codes for more frequent characters. This minimizes the average code length, resulting in efficient data compression.
 
-This class implements the actual compression/decompression algorithms:
+For example, in English text, 'e' appears more frequently than 'z', so 'e' might get a shorter code (like '10') while 'z' might get a longer one (like '000111').
 
-- **Private methods**:
-  - `countFrequencies()`: Counts occurrences of each byte in input data
-  - `buildHuffmanTree()`: Creates a Huffman tree from frequency data
-  - `generateCodes()`: Traverses tree to assign bit codes to each byte
-  - `serializeTree()`: Converts Huffman tree to binary for storage in header
-  - `deserializeTree()`: Reconstructs Huffman tree from binary header
+### HuffmanNode Structure
 
-- **Public methods**:
-  - `compress()`: Compresses raw data using Huffman coding
-  - `decompress()`: Decompresses Huffman-encoded data
-  - `getCompressionRatio()`: Calculates compression percentage
+The core data structure is the HuffmanNode:
 
-The class recently added image compression with:
-  - `compressImage()`: Compresses image data with prediction-based preprocessing
-  - `decompressImage()`: Recovers original image from compressed data
+```cpp
+struct HuffmanNode {
+    unsigned char byte;
+    uint64_t frequency;
+    std::shared_ptr<HuffmanNode> left;
+    std::shared_ptr<HuffmanNode> right;
+    
+    // Constructors and methods...
+    bool isLeaf() const {
+        return left == nullptr && right == nullptr;
+    }
+};
+```
 
-### 3. EncryptionModule.h
+Each node is either:
+- A leaf node representing an actual byte from the input
+- An internal node combining two other nodes (with frequency equal to the sum of its children)
 
-Provides AES-256 encryption capabilities:
+### Bit Manipulation Utilities
 
-- **Methods**:
-  - `encrypt()`: Encrypts data with a password
-  - `decrypt()`: Decrypts data with the correct password
-  - `generateKey()`: Creates encryption key from password
-  - `generateIV()`: Creates initialization vector for AES
+Since Huffman codes are variable-length bit sequences, special classes handle bit-level operations:
 
-This adds security to compressed files for sensitive data.
+#### BitWriter
+```cpp
+class BitWriter {
+    // Writes individual bits or bit sequences
+    // Packs bits into bytes
+    // Maintains internal buffer of completed bytes
+};
+```
 
-### 4. FileProcessor.h
+#### BitReader
+```cpp
+class BitReader {
+    // Reads individual bits from a byte array
+    // Keeps track of current bit and byte position
+    // Checks if more bits are available
+};
+```
 
-Handles file I/O operations:
+## Compression and Decompression Process
 
-- **Static methods**:
-  - `readFile()`: Reads binary file content into a byte vector
-  - `writeFile()`: Writes byte vector to a file
-  - `getCompressedPath()`: Generates output path for compressed files
-  - `getDecompressedPath()`: Generates output path for decompressed files
+### The HuffmanCompressor Class
 
-Manages all interaction with the filesystem.
+This class implements the actual compression and decompression algorithms:
 
-### 5. BatchProcessor.h
+```cpp
+class HuffmanCompressor {
+    // Compresses and decompresses data using Huffman coding
+};
+```
 
-Implements multi-threaded batch processing:
+### Compression Steps
 
-- **Methods**:
-  - `processBatch()`: Processes multiple files concurrently
-  - `getThreadCount()`: Returns number of worker threads
+1. **Frequency Analysis**:
+```cpp
+FrequencyMap countFrequencies(const std::vector<unsigned char>& data) {
+    // Count how often each byte appears in the input
+}
+```
 
-Uses a thread pool to parallelize compression/decompression across files.
+2. **Build the Huffman Tree**:
+```cpp
+HuffmanTree buildHuffmanTree(const FrequencyMap& frequencies) {
+    // Create leaf nodes for each byte
+    // Use priority queue to combine nodes with lowest frequencies
+    // Create the optimal prefix code tree
+}
+```
 
-### 6. PerformanceAnalyzer.h
+3. **Generate Codes**:
+```cpp
+void generateCodes(const HuffmanTree& tree, CodeMap& codes, std::string code = "") {
+    // Traverse the tree to generate codes for each byte
+    // '0' for left branches, '1' for right branches
+}
+```
 
-Measures and reports on compression performance:
+4. **Serialize the Tree and Compress Data**:
+```cpp
+std::vector<unsigned char> compress(const std::vector<unsigned char>& data) {
+    // Count frequencies
+    // Build Huffman tree
+    // Generate codes
+    // Write header (original size + serialized tree)
+    // Encode each byte using its Huffman code
+    // Return compressed data
+}
+```
 
-- **Classes**:
-  - `Timer`: Records time taken, original size, and compressed size
-  - `PerformanceAnalyzer`: Manages multiple timers and generates reports
+### Decompression Steps
 
-Tracks efficiency metrics like speed and compression ratio.
+1. **Parse Header and Rebuild Tree**:
+```cpp
+HuffmanTree deserializeTree(BitReader& reader) {
+    // Reconstruct the Huffman tree from the bit sequence
+}
+```
 
-### 7. HuffmanCompress.cpp (Main file)
+2. **Decode Data**:
+```cpp
+std::vector<unsigned char> decompress(const std::vector<unsigned char>& compressedData) {
+    // Extract header size, header, and data sections
+    // Read original size
+    // Deserialize Huffman tree
+    // Decode bits by traversing the tree
+    // Return decompressed data
+}
+```
 
-The main file ties everything together:
+## File Management
 
-- **Components**:
-  - `Options`: Structure for command-line arguments
-  - `ProgressBar`: Visual indicator of batch processing progress
-  - `parseArguments()`: Converts command-line input to Options
-  - `expandPaths()`: Resolves wildcards and directory inputs
-  - `compressFile()/decompressFile()`: Core file processing functions
-  - `main()`: Entry point that orchestrates the entire process
+The FileProcessor class handles all file input/output operations:
 
-## How Compression Works (The Flow)
+```cpp
+class FileProcessor {
+    // Methods for reading, writing, and managing files
+};
+```
 
-### Compression Process
+### Key File Operations
 
-1. **Input Preparation**:
-   - User specifies files via command line
-   - Input paths are expanded (wildcards, directories)
-   
-2. **For Each File**:
-   - File data is read into memory as a byte vector
-   - Frequencies of each byte are counted
+```cpp
+// Read entire file into memory
+static std::vector<unsigned char> readFile(const std::string& filePath);
 
-3. **Huffman Tree Construction**:
-   - Bytes are sorted by frequency in a priority queue
-   - A binary tree is built bottom-up (less frequent characters deeper in tree)
-   
-4. **Code Generation**:
-   - Each byte is assigned a variable-length bit code (shorter for frequent bytes)
-   - The tree structure is serialized into the header
+// Write data buffer to file
+static void writeFile(const std::string& filePath, const std::vector<unsigned char>& data);
 
-5. **Output Creation**:
-   - Original data size is stored in header (for decompression)
-   - Tree structure is stored in header
-   - Data bytes are replaced with their Huffman codes
-   - Optional encryption is applied if requested
-   - Result is written to output file with `.huf` extension
+// Generate paths for compressed/decompressed files
+static std::string getCompressedPath(const std::string& inputPath, const std::string& outputDir = "");
+static std::string getDecompressedPath(const std::string& inputPath, const std::string& outputDir = "");
 
-### Decompression Process
+// List files in directory
+static std::vector<std::string> listFiles(const std::string& directory, bool recursive = false);
+```
 
-1. **Input Processing**:
-   - Compressed file is read into memory
-   - Optional decryption is applied if password provided
-   
-2. **Header Parsing**:
-   - Original data size is extracted
-   - Huffman tree is deserialized from the header
-   
-3. **Data Reconstruction**:
-   - Compressed data bits are read
-   - Bits are traversed through the Huffman tree
-   - When a leaf node is reached, the corresponding byte is output
-   - Process continues until original data size is reached
-   
-4. **Output**:
-   - Decompressed data is written to output file
+The class handles directory creation, path construction, and file existence checks, providing a robust interface for file operations.
 
-## Key Algorithms
+## Security: AES-256 Encryption
 
-### Huffman Coding
+The EncryptionModule provides security features using the AES-256 algorithm:
 
-1. **Frequency Analysis**: Count occurrences of each byte
-2. **Tree Building**: Create a binary tree where:
-   - Leaf nodes represent bytes
-   - Path to each leaf defines its bit code
-   - More frequent bytes have shorter paths
-3. **Encoding**: Replace bytes with their variable-length bit codes
-4. **Space Savings**: Frequent bytes use fewer bits than rare ones
+```cpp
+class EncryptionModule {
+    // Methods for encrypting and decrypting data
+};
+```
 
-### Delta Encoding for Images
+### Encryption Process
 
-1. **Prediction**: Predict each pixel based on neighbors
-2. **Delta Calculation**: Store difference between actual and predicted value
-3. **Benefits**: Produces smaller values that compress better with Huffman
+```cpp
+std::vector<unsigned char> encrypt(const std::vector<unsigned char>& data, const std::string& password) {
+    // Generate random salt
+    // Derive encryption key using PBKDF2
+    // Generate random IV (Initialization Vector)
+    // Encrypt data using AES-256-CBC
+    // Return [salt][IV][encrypted data]
+}
+```
 
-### Multi-threading
+### Decryption Process
 
-1. **Thread Pool**: Creates a set of worker threads
-2. **Task Queue**: Files are distributed among worker threads
-3. **Progress Tracking**: Completed files are counted for progress display
+```cpp
+std::vector<unsigned char> decrypt(const std::vector<unsigned char>& encryptedData, const std::string& password) {
+    // Extract salt and IV
+    // Derive key from password and salt
+    // Decrypt data using AES-256-CBC
+    // Return original data
+}
+```
 
-## Usage Examples
+Security features include:
+- AES-256 encryption (considered quantum-resistant)
+- PBKDF2 key derivation with 10,000 iterations
+- Random salt and IV for each encryption
+- Proper padding using PKCS#7
 
-1. **Basic Compression**:
-   ```
-   huffman_compress file.txt
-   ```
+## Parallel Processing
 
-2. **Decompression**:
-   ```
-   huffman_compress -d file.txt.huf
-   ```
+The BatchProcessor implements multi-threaded processing for improved performance:
 
-3. **Encrypted Compression**:
-   ```
-   huffman_compress -e -p mypassword file.txt
-   ```
+```cpp
+class BatchProcessor {
+    // Thread pool implementation for parallel file processing
+};
+```
 
-4. **Batch Processing**:
-   ```
-   huffman_compress -b *.txt -o compressed_files/
-   ```
+### Thread Pool Design
 
-5. **Image Compression** (with new functionality):
-   ```
-   huffman_compress --image image.raw -w 1024 -h 768 -c 3
-   ```
+```cpp
+// Thread pool with fixed number of worker threads
+BatchProcessor(size_t threads = 0);
 
-This project provides a complete, versatile file compression utility with security features, batch processing capabilities, and performance analytics.
+// Process multiple files in parallel
+template<typename Func>
+void processBatch(const std::vector<std::string>& filePaths, Func processFunc,
+                  std::function<void(const std::string&, int, int)> progressCallback = nullptr);
+```
+
+The implementation uses:
+- Worker threads that wait for tasks
+- Thread-safe task queue
+- Condition variables for efficient thread waiting
+- Atomic counters for progress tracking
+
+### Processing Flow
+
+1. Create thread pool with specified number of threads (default: CPU core count)
+2. Submit each file as a task to the queue
+3. Workers process files in parallel
+4. Main thread waits for all tasks to complete
+5. Progress is reported via callback function
+
+## Performance Analysis
+
+The PerformanceAnalyzer tracks and reports compression metrics:
+
+```cpp
+class PerformanceAnalyzer {
+    // Methods for performance measurement and reporting
+};
+```
+
+### Timer Implementation
+
+```cpp
+class Timer {
+    // Nested class for timing operations
+    // Uses RAII pattern - timing starts on construction and ends on destruction
+};
+```
+
+### Performance Metrics
+
+```cpp
+struct Metric {
+    double duration;      // in milliseconds
+    size_t originalSize;
+    size_t compressedSize;
+    
+    double getCompressionRatio() const;
+    double getThroughput() const;
+};
+```
+
+The analyzer provides:
+- Per-file timing and size information
+- Compression ratios
+- Throughput in MB/s
+- Detailed performance reports
+
+## Main Application Structure
+
+The main program (HuffmanCompress.cpp) ties everything together:
+
+### Command Line Options
+
+```cpp
+struct Options {
+    bool encrypt = false;
+    bool batch = false;
+    bool verbose = false;
+    bool decompress = false;
+    bool help = false;
+    bool version = false;
+    int threads = 0;  // 0 means use all available threads
+    std::string outputDir;
+    std::vector<std::string> inputPaths;
+    std::string password;
+};
+```
+
+### Main Processing Flow
+
+1. Parse command line arguments
+2. Expand paths (handle wildcards and directories)
+3. Select operation mode (single/batch, compress/decompress)
+4. Process files with appropriate methods
+5. Generate performance reports
+
+### Compression Function
+
+```cpp
+void compressFile(const std::string& inputPath, const std::string& outputPath, 
+                 const std::string& password, bool verbose, PerformanceAnalyzer& analyzer) {
+    // Read input file
+    // Compress data
+    // Encrypt if password provided
+    // Write output file
+}
+```
+
+### Decompression Function
+
+```cpp
+void decompressFile(const std::string& inputPath, const std::string& outputPath, 
+                   const std::string& password, bool verbose, PerformanceAnalyzer& analyzer) {
+    // Read input file
+    // Decrypt if password provided
+    // Decompress data
+    // Write output file
+}
+```
+
+## Technical Design Decisions
+
+### Memory Management
+
+The system uses modern C++ memory management:
+- `std::shared_ptr` for tree nodes and shared resources
+- RAII pattern for resource acquisition and release
+- Automatic cleanup even when exceptions occur
+
+### Error Handling
+
+The code implements comprehensive error handling:
+- Input validation before operations
+- Descriptive exception messages
+- Graceful recovery from errors in batch processing
+- Proper cleanup of resources
+
+### Efficiency Considerations
+
+Several optimizations enhance performance:
+- Pre-allocation of buffers with reserve()
+- Efficient bit packing for minimal storage overhead
+- Thread pool for parallel processing
+- Move semantics for efficient data transfer
+
+## Algorithms Used
+
+### Core Compression Algorithms
+- **Huffman Coding Algorithm**: Primary lossless data compression technique
+- **Shannon-Fano-Elias Coding**: Variant implementation in the Huffman module
+
+### Cryptographic Algorithms
+- **AES-256**: Block cipher encryption algorithm
+- **PKCS#7 Padding**: Block padding scheme for cryptographic functions
+- **PBKDF2**: Password-based key derivation for secure key generation
+
+### Data Processing Algorithms
+- **Producer-Consumer Pattern**: For efficient batch file processing
+- **Work Stealing Algorithm**: Dynamic load balancing in thread pool
+
+### Search and File System Algorithms
+- **Glob Pattern Matching**: For wildcard expansion in batch operations
+- **Breadth-First Directory Traversal**: For filesystem operations
+
+### Performance Analysis Algorithms
+- **Moving Average Algorithm**: For performance metrics calculation
+- **Amdahl's Law Analysis**: For parallelization efficiency estimation
+
+### Utility Algorithms
+- **Binary Bit Packing**: For efficient bit-level data storage
+- **Prefix-Free Code Generation**: Within the Huffman implementation
+- **Command Line Argument Parsing**: For option processing
+- **Exponential Backoff Algorithm**: For thread synchronization
+
+## Conclusion
+
+File-Shrink demonstrates a comprehensive approach to file compression, combining the efficient Huffman coding algorithm with modern features like encryption, parallel processing, and detailed analytics. The modular design allows for easy maintenance and future extensions.
+
+The system balances efficiency, security, and usability, providing a versatile tool for reducing file sizes while maintaining data integrity and offering protection through strong encryption.
